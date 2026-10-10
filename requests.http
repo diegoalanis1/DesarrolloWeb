@@ -7,3 +7,7 @@ GET http://localhost:8080/api/v1/no-existe
 
 ### Método incorrecto: debe responder 405
 POST http://localhost:8080/api/v1/saludo
+
+### Saludo con nombre
+GET http://localhost:8080/api/v1/saludo?nombre=Ada
+Accept: application/json
