@@ -4,3 +4,6 @@ Accept: application/json
 
 ### Ruta inexistente: debe responder 404
 GET http://localhost:8080/api/v1/no-existe
+
+### Método incorrecto: debe responder 405
+POST http://localhost:8080/api/v1/saludo
