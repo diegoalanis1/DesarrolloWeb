@@ -4,10 +4,19 @@
 POST {{baseUrl}}/alumnos
 Content-Type: application/json
 
-{"matricula":"A001","nombre":"Ada Lovelace","correo":"ada@universidad.mx"}
+{"matricula":"A004","nombre":"Alumno 4","correo":"ada@universidad.mx","estatus":"baja"}
 
-### Listar alumnos
+### Listar alumnos, sin filtro
 GET {{baseUrl}}/alumnos
+
+### Listar alumnos, activo
+GET {{baseUrl}}/alumnos?estatus=ACTIVO
+
+### Listar alumnos, baja
+GET {{baseUrl}}/alumnos?estatus=BAJA
+
+### Listar alumnos, incorrecto
+GET {{baseUrl}}/alumnos?estatus=BAJa
 
 ### Consultar alumno
 GET {{baseUrl}}/alumnos/1
@@ -19,4 +28,4 @@ Content-Type: application/json
 {"nombre":"Ada Byron","correo":"ada.byron@universidad.mx"}
 
 ### Eliminar alumno: 204
-DELETE {{baseUrl}}/alumnos/1
+DELETE {{baseUrl}}/alumnos/2

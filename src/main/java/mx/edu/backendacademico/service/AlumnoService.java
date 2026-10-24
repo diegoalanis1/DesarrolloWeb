@@ -28,12 +28,12 @@ public class AlumnoService {
         return repository.buscarPorId(id).orElseThrow(() -> new AlumnoNoEncontradoException(id));
     }
 
-    public Alumno crear(String matricula, String nombre, String correo) {
+    public Alumno crear(String matricula, String nombre, String correo, String estatus) {
         // Esta comprobación mejora el mensaje; el almacén vuelve a proteger unicidad.
         if (repository.existePorMatricula(matricula)) {
             throw new MatriculaDuplicadaException(matricula);
         }
-        return repository.guardar(new Alumno(null, matricula, nombre, correo, EstatusAlumno.ACTIVO));
+        return repository.guardar(new Alumno(null, matricula, nombre, correo, EstatusAlumno.valueOf(estatus.toUpperCase())));
     }
 
     public Alumno actualizar(Long id, String nombre, String correo) {

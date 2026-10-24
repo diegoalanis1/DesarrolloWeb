@@ -4,20 +4,15 @@ package mx.edu.backendacademico.controller;
 
 import java.net.URI;
 import java.util.List;
+
+import mx.edu.backendacademico.domain.EstatusAlumno;
 import mx.edu.backendacademico.dto.ActualizarAlumnoRequest;
 import mx.edu.backendacademico.dto.AlumnoMapper;
 import mx.edu.backendacademico.dto.AlumnoResponse;
 import mx.edu.backendacademico.dto.CrearAlumnoRequest;
 import mx.edu.backendacademico.service.AlumnoService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/alumnos")
@@ -27,7 +22,16 @@ public class AlumnoController {
 
     // GET consulta sin solicitar cambios de estado de negocio.
     @GetMapping
-    public List<AlumnoResponse> listar() { return service.listar().stream().map(AlumnoMapper::toResponse).toList(); }
+    public List<AlumnoResponse> listar(@RequestParam(required = false) EstatusAlumno estatus) {
+
+        var alumnos = service.listar().stream();
+
+        if (estatus != null) {
+            alumnos = alumnos.filter(alumno -> alumno.estatus() == estatus);
+        }
+
+        return alumnos.map(AlumnoMapper::toResponse).toList();
+    }
 
     // GET consulta sin solicitar cambios de estado de negocio.
     @GetMapping("/{id}")
@@ -36,7 +40,7 @@ public class AlumnoController {
     // El servicio asigna identidad; ResponseEntity publica 201 y Location.
     @PostMapping
     public ResponseEntity<AlumnoResponse> crear(@RequestBody CrearAlumnoRequest request) {
-        var creado = service.crear(request.matricula(), request.nombre(), request.correo());
+        var creado = service.crear(request.matricula(), request.nombre(), request.correo(), request.estatus());
         return ResponseEntity.created(URI.create("/api/v1/alumnos/" + creado.id())).body(AlumnoMapper.toResponse(creado));
     }
 
