@@ -20,6 +20,7 @@ Content-Type: application/json
 
 ### Eliminar alumno: 204
 DELETE {{baseUrl}}/alumnos/1
+
 ### Body inválido: 400 con campos
 POST {{baseUrl}}/alumnos
 Content-Type: application/json
@@ -31,3 +32,9 @@ POST {{baseUrl}}/alumnos
 Content-Type: application/json
 
 {"matricula":"A001","nombre":"Otra persona","correo":"otra@universidad.mx"}
+
+### Matricula con espacios: 400 con campos
+POST {{baseUrl}}/alumnos
+Content-Type: application/json
+
+{"matricula":"A 001","nombre":"Ada Lovelace","correo":"ada@universidad.mx"}
