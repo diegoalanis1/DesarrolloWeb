@@ -42,3 +42,19 @@ Authorization: Basic docente docente123
 DELETE http://localhost:8080/api/v1/alumnos/2
 Authorization: Basic docente docente123
 X-CSRF-TOKEN: {{csrf}}
+
+### Alumno consulta su propio expediente
+GET http://localhost:8080/api/v1/alumnos/1/expediente
+Authorization: Basic alumno alumno123
+
+### Alumno intenta consultar expediente ajeno
+GET http://localhost:8080/api/v1/alumnos/1/expediente
+Authorization: Basic alumno2 alumno456
+
+### Administrador consulta expediente ajeno
+GET http://localhost:8080/api/v1/alumnos/1/expediente
+Authorization: Basic admin admin123
+
+### Alumno consulta su expediente sin proporcionar ID
+GET http://localhost:8080/api/v1/alumnos/mi-expediente
+Authorization: Basic alumno2 alumno456

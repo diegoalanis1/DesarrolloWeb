@@ -5,27 +5,26 @@ package mx.edu.backendacademico.controller;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+
+import mx.edu.backendacademico.config.IdentidadAlumno;
 import mx.edu.backendacademico.dto.ActualizarAlumnoRequest;
 import mx.edu.backendacademico.dto.AlumnoMapper;
 import mx.edu.backendacademico.dto.AlumnoResponse;
 import mx.edu.backendacademico.dto.CrearAlumnoRequest;
 import mx.edu.backendacademico.service.AlumnoService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/alumnos")
 public class AlumnoController {
     private final AlumnoService service;
-    public AlumnoController(AlumnoService service) { this.service = service; }
-
+    private final IdentidadAlumno identidadAlumno;
+    public AlumnoController(AlumnoService service, IdentidadAlumno identidadAlumno) {this.service = service;this.identidadAlumno = identidadAlumno;}
     // GET consulta sin solicitar cambios de estado de negocio.
     @GetMapping
     public List<AlumnoResponse> listar() { return service.listar().stream().map(AlumnoMapper::toResponse).toList(); }
@@ -33,6 +32,54 @@ public class AlumnoController {
     // GET consulta sin solicitar cambios de estado de negocio.
     @GetMapping("/{id}")
     public AlumnoResponse buscar(@PathVariable Long id) { return AlumnoMapper.toResponse(service.buscar(id)); }
+
+    // Consulta el expediente asociado al usuario autenticado.
+    @GetMapping("/mi-expediente")
+    public AlumnoResponse miExpediente(Authentication authentication) {
+
+        String matricula = identidadAlumno.obtenerMatricula(
+                authentication.getName()
+        );
+
+        if (matricula == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        var alumno = service.listar().stream()
+                .filter(a -> a.matricula().equals(matricula))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe el alumno asociado al usuario"
+                ));
+
+        return AlumnoMapper.toResponse(alumno);
+    }
+
+    // Consulta un expediente específico con autorización por objeto.
+    @GetMapping("/{id}/expediente")
+    public AlumnoResponse consultarExpediente(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        var alumno = service.buscar(id);
+
+        boolean esAdministrador = authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!esAdministrador) {
+            String matricula = identidadAlumno.obtenerMatricula(
+                    authentication.getName()
+            );
+
+            if (matricula == null || !matricula.equals(alumno.matricula())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }
+
+        return AlumnoMapper.toResponse(alumno);
+    }
 
     // El servicio asigna identidad; ResponseEntity publica 201 y Location.
     @PostMapping

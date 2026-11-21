@@ -40,6 +40,7 @@ public class SecurityConfig {
         // Cuentas públicas de laboratorio; no contienen credenciales reales.
         return new InMemoryUserDetailsManager(
                 User.withUsername("alumno").password(encoder.encode("alumno123")).roles("ALUMNO").build(),
+                User.withUsername("alumno2").password(encoder.encode("alumno456")).roles("ALUMNO").build(),
                 User.withUsername("docente").password(encoder.encode("docente123")).roles("DOCENTE").build(),
                 User.withUsername("admin").password(encoder.encode("admin123")).roles("ADMIN").build());
     }
