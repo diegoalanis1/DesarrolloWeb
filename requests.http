@@ -42,3 +42,6 @@ Authorization: Basic docente docente123
 DELETE http://localhost:8080/api/v1/alumnos/2
 Authorization: Basic docente docente123
 X-CSRF-TOKEN: {{csrf}}
+
+### openapi
+GET http://localhost:8080/openapi.yaml
