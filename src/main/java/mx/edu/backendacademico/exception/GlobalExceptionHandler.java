@@ -71,6 +71,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return detalle;
     }
 
+    @ExceptionHandler(ClaveIdempotenciaReutilizadaException.class)
+    ProblemDetail claveIdempotenciaReutilizada(
+            ClaveIdempotenciaReutilizadaException ex) {
+        return problema(
+                HttpStatus.CONFLICT,
+                "CLAVE_IDEMPOTENCIA_REUTILIZADA",
+                ex.getMessage()
+        );
+    }
+
     private ProblemDetail problema(HttpStatus status, String codigo, String mensaje) {
         var detalle = ProblemDetail.forStatusAndDetail(status, mensaje);
         detalle.setTitle(status.getReasonPhrase());
